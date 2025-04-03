@@ -3,7 +3,7 @@ A multithreaded C++ tool to detect ELF binaries infected by a specific byte-patt
 It scans a directory recursively, identifies ELF files, and checks each one for the presence of the given signature.
 
 ## How It Works
-- **Pattern Matching:** Uses the **Boyer-Moore** string search algorithm for fast and efficient pattern detection. It is especially well-suited for:
+- **Pattern Matching:** Uses the **[Boyer-Moore](https://en.cppreference.com/w/cpp/utility/functional/boyer_moore_searcher)** string search algorithm, for fast and efficient pattern detection. This algorythm is included in the c++ standard library. It is especially well-suited for:
     - **Large file sizes**, where skipping ahead in the search reduces unnecessary comparisons.
     - **Repeated searches**, since the pattern is preprocessed once and reused across all files.
 
