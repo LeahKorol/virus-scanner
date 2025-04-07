@@ -23,7 +23,7 @@ For every infected file found, the program prints:
 `g++ -std=c++20 main.cpp PatternScanner.cpp threadpool.c -o find_sig`
 
 ## Usage
-`./main <directory_path> <signature_path>`
+`./find_sig <directory_path> <signature_path>`
 
 `<directory_path>`: Path to the root directory from which the search should be started
 
