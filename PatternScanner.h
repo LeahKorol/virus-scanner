@@ -84,10 +84,9 @@ private:
      * Checks if a file stream contains the pattern_ using the boyer-moore searcher_.
      *
      * @param file The input file stream to search.
-     * @param buffer Buffer used for reading chunks of the file.
      * @return true if the pattern_ is found, false otherwise.
      */
-    bool Contains(std::ifstream& file, std::vector<char>& buffer);
+    bool Contains(std::ifstream& file);
 
     /*
      * Thread entry point wrapper.

@@ -101,13 +101,11 @@ bool PatternScanner::IsELFFile(const std::filesystem::path& file_path){
 }
 
 void PatternScanner::ReportInfectedFile(const std::filesystem::path& file_path){
-    std::vector<char> buffer(BUFFER_SIZE + pattern_.size() - 1); // Extra space for overlap
-
     std::ifstream file(file_path, std::ios::in | std::ios::binary);
     if (!file) {
         throw std::ios_base::failure("[ReportInfectedFile]: Failed to open file: " + file_path.string());
     }
-    if (Contains(file, buffer)) {
+    if (Contains(file)) {
         {//Writes to a buffer so printing of different threads won't be mixed
             std::osyncstream (std::cout) << "File " << file_path << " is infected!" << std::endl;
         } // Emits the contents of the temporary buffer
@@ -119,15 +117,17 @@ void PatternScanner::ReportInfectedFile(const std::filesystem::path& file_path){
     }
 }
 
-bool PatternScanner::Contains(std::ifstream& file, std::vector<char>& buffer){
+bool PatternScanner::Contains(std::ifstream& file){
     /* Look for `pattern_` in the file, even if it’s split between two chunks.
        When reading the next part of the file, keep the last (pattern_.size() - 1) bytes
        from the previous chunk to catch patterns that spam across chunks.*/
 
     size_t num_bytes;
+    std::vector<char> buffer(BUFFER_SIZE + pattern_.size() - 1); // Extra space for overlap
+    //in the first read, must read to the beginnig of the buffer to prevent false positives
+    char* read_pointer = 0;
 
     while (file) {
-        char* read_pointer = buffer.data() + (pattern_.size() - 1);
         file.read(read_pointer, BUFFER_SIZE);
         std::streamsize bytes_read = file.gcount();
         num_bytes = pattern_.size() - 1 + bytes_read;
@@ -143,6 +143,8 @@ bool PatternScanner::Contains(std::ifstream& file, std::vector<char>& buffer){
         }
         // Move the last `pattern_.size() - 1` bytes to the beginning of the buffer
         std::copy(buffer.end() - (pattern_.size() - 1), buffer.end(), buffer.begin());
+        //from the second read and next, read the next data to index pattern_.size()-1 to handle overlaps
+        read_pointer = buffer.data() + (pattern_.size() - 1);
     }
     return false;
 }
